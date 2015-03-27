@@ -1,0 +1,2 @@
+wget -e robots=off -H -p -k --mirror --adjust-extension --page-requisites --user-agent="Mozilla/5.0 Firefox/4.0.1" --refer=https://google.com --domains=www.classes.cs.uchicago.edu https://www.classes.cs.uchicago.edu/archive/2015/winter/22300-1/Schedule.html
+
