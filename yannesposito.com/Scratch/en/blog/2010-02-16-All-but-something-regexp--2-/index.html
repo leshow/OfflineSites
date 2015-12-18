@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>YBlog - Pragmatic Regular Expression Exclude (2)</title>
+        <meta name="keywords" content="regexp, regular expression" />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../../../img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="../../../css/scientific.css" />
+        <link rel="stylesheet" type="text/css" href="../../../js/highlight/styles/solarized_dark.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/solarized.css" />
+		<!-- Font -->
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/yannespositocomen" />
+        <!--[if lt IE 9]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+        <![endif]-->
+
+    </head>
+    <body lang="en" class="article">
+        <div id="content">
+	        			<div id="header">
+			    <div id="choix">
+        	        <div id="choixlang">
+                        <a href="../../../fr/blog/2010-02-16-All-but-something-regexp--2-/index.html">French</a> 
+        	        </div>
+					<div id="switchcss"><a href="index.html#">Change Theme</a></div>
+                    <div class="tomenu"><a href="index.html#navigation">↓ Menu ↓</a></div>
+        	        <div class="flush"></div>
+        	    </div>
+			</div>
+
+			<div id="titre">
+				<h1>Pragmatic Regular Expression Exclude (2)</h1>
+				
+			</div>
+			<div class="flush"></div>
+			<div id="afterheader" class="article">
+				<div class="corps">
+					<p>In my <a href="../2010-02-15-All-but-something-regexp.1.html">previous post</a> I had given some trick to match all except something. On the same idea, the trick to match the smallest possible string. Say you want to match the string between ‘a’ and ‘b’, for example, you want to match:</p>
+<pre>
+a.....<strong class="blue">a......b</strong>..b..a....<strong class="blue">a....b</strong>...
+</pre>
+<p>Here are two common errors and a solution:</p>
+<pre>
+/a.*b/
+<strong class="red">a.....a......b..b..a....a....b</strong>...
+</pre>
+<p>The first error is to use the <em>evil</em> <code>.*</code>. Because you will match from the first to the last.</p>
+<pre>
+/a.*?b/
+<strong class="red">a.....a......b</strong>..b..<strong class="red">a....a....b</strong>...
+</pre>
+<p>The next natural way, is to change the <em>greediness</em>. But it is not enough as you will match from the first <code>a</code> to the first <code>b</code>. Then a simple constatation is that our matching string shouldn’t contain any <code>a</code> nor <code>b</code>. Which lead to the last elegant solution.</p>
+<pre>
+/a[^ab]*b/
+a.....<strong class="blue">a......b</strong>..b..a....<strong class="blue">a....b</strong>...
+</pre>
+<p>Until now, that was, easy. Now, just pass at the case you need to match not between <code>a</code> and <code>b</code>, but between strings. For example:</p>
+<pre class="sourceCode html"><code class="sourceCode html"><span class="kw">&lt;li&gt;</span>...<span class="kw">&lt;li&gt;</span></code></pre>
+<p>This is a bit difficult. You need to match</p>
+<pre class="sourceCode html"><code class="sourceCode html"><span class="kw">&lt;li&gt;</span>[anything not containing <span class="kw">&lt;li&gt;</span>]<span class="kw">&lt;/li&gt;</span></code></pre>
+<p>The first method would be to use the same reasoning as in my <a href="../2010-02-15-All-but-something-regexp.1.html">previous post</a>. Here is a first try:</p>
+<pre class="sourceCode perl"><code class="sourceCode perl">&lt;li&gt;([^&lt;]|&lt;[^l]|&lt;l[^i]|&lt;li[^&gt;])<span class="dt">*&lt;</span><span class="kw">/</span><span class="ot">li&gt;</span></code></pre>
+<p>But what about the following string:</p>
+<pre class="sourceCode html"><code class="sourceCode html"><span class="kw">&lt;li&gt;</span>...<span class="kw">&lt;li</span><span class="er">&lt;/li</span><span class="kw">&gt;</span></code></pre>
+<p>That string should not match. This is why if we really want to match it correctly<sup><a href="index.html#note1">†</a></sup> we need to add:</p>
+<pre class="sourceCode perl"><code class="sourceCode perl">&lt;li&gt;([^&lt;]|&lt;[^l]|&lt;l[^i]|&lt;li[^&gt;])*(|&lt;|&lt;l|&lt;li)&lt;/li&gt;</code></pre>
+<p>Yes a bit complicated. But what if the string I wanted to match was even longer?</p>
+<p>Here is the algorithm way to handle this easily. You reduce the problem to the first one letter matching:</p>
+<pre class="sourceCode perl"><code class="sourceCode perl"><span class="co"># transform a simple randomly choosen character</span>
+<span class="co"># to an unique ID</span>
+<span class="co"># (you should verify the identifier is REALLY unique)</span>
+<span class="co"># beware the unique ID must not contain the</span>
+<span class="co"># choosen character</span>
+<span class="kw">s/</span><span class="ot">X</span><span class="kw">/</span><span class="st">_was_x_</span><span class="kw">/g</span>
+<span class="kw">s/</span><span class="ot">Y</span><span class="kw">/</span><span class="st">_was_y_</span><span class="kw">/g</span>
+
+<span class="co"># transform the long string in this simple character</span>
+<span class="kw">s/</span><span class="ot">&lt;li&gt;</span><span class="kw">/</span><span class="st">X</span><span class="kw">/g</span>
+<span class="kw">s/</span><span class="ot">&lt;\/li&gt;</span><span class="kw">/</span><span class="st">Y</span><span class="kw">/g</span>
+
+<span class="co"># use the first method</span>
+<span class="kw">s/</span><span class="ot">X</span><span class="ch">([^</span><span class="bn">X</span><span class="ch">]*)</span><span class="ot">Y</span><span class="kw">//g</span>
+
+<span class="co"># retransform choosen letter by string</span>
+<span class="kw">s/</span><span class="ot">X</span><span class="kw">/</span><span class="st">&lt;li&gt;</span><span class="kw">/g</span>
+<span class="kw">s/</span><span class="ot">Y</span><span class="kw">/</span><span class="st">&lt;\/li&gt;</span><span class="kw">/g</span>
+
+<span class="co"># retransform the choosen character back</span>
+<span class="kw">s/</span><span class="ot">_was_x_</span><span class="kw">/</span><span class="st">X</span><span class="kw">/g</span>
+<span class="kw">s/</span><span class="ot">_was_y_</span><span class="kw">/</span><span class="st">Y</span><span class="kw">/g</span></code></pre>
+<p>And it works in only 9 lines for any beginning and ending string. This solution should look less <em>I AM THE GREAT REGEXP M45T3R, URAN00B</em>, but is more convenient in my humble opinion. Further more, using this last solution prove you master regexp, because you know it is difficult to manage such problems with only a regexp.</p>
+<hr />
+<p><small><a name="note1"><sup>†</sup></a> I know I used an HTML syntax example, but in my real life usage, I needed to match between <code>en:</code> and <code>::</code>. And sometimes the string could finish with <code>e::</code>.</small></p>
+				</div>
+                <div id="afterarticle">
+                    <div id="social">
+                        <a target="_blank" href="http://feeds.feedburner.com/yannespositocomen" class="social">r</a>
+                        ·
+                         <a target="_blank" href="https://twitter.com/home?status=http://yannesposito.com/Scratch/en/blog/2010-02-16-All-but-something-regexp--2-/%20via%20@yogsototh" class="social">t</a>
+                        ·
+                        <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/Scratch/en/blog/2010-02-16-All-but-something-regexp--2-/" class="social">`</a>
+                        ·
+                         <a target="_blank" href="https://plus.google.com/share?url=http://yannesposito.com/Scratch/en/blog/2010-02-16-All-but-something-regexp--2-/" class="social">g</a>
+                        <br />
+                        <a class="message" href="../Social-link-the-right-way/index.html">These social sharing links preserve your privacy</a>
+                    </div>
+        	        <div id="navigation">
+                        <a href="../../../../index.html">Home</a>
+                        <span class="sep">¦</span>
+        	            <a href="../../blog.1.html">Blog</a>
+                        <span class="sep">¦</span>
+                        <a href="../../softwares.html">Softwares</a>
+                        <span class="sep">¦</span>
+                        <a href="../../about.html">About</a>
+        	        </div>
+                    <div id="totop"><a href="index.html#header">↑ Top ↑</a></div>
+				    <div class="corps" id="comment">
+            	        <h2 class="first">Comments</h2>
+				    	<div id="disqus_thread"></div>
+        		    	<script type="text/javascript">
+        		    	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        		    	    var disqus_shortname = 'yannesposito'; // required: replace example with your forum shortname
+                            var disqus_identifier = '/Scratch/en/blog/2010-02-16-All-but-something-regexp--2-/index.html';
+
+        		    	    /* * * DON'T EDIT BELOW THIS LINE * * */
+        		    	    (function() {
+        		    	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        		    	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        		    	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        		    	    })();
+        		    	</script>
+        		    	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        		    	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				    </div>
+                    <div class="tomenu"><a>↑ Menu ↑</a></div>
+				    <div id="bottom">
+            	        <div>
+            	            Published on 2010-02-16
+            	        </div>
+            	        <div>
+            	            <a href="https://twitter.com/yogsototh">Follow @yogsototh</a>
+            	        </div>
+            	        <div>
+                            <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Yann Esposito©</a>
+            	        </div>
+            	        <div>
+            	            Done with
+            	            <a href="http://www.vim.org" target="_blank">Vim</a>
+				    		<span class="pala">&amp;</span>
+                            <a href="http://nanoc.ws" target="_blank"><span class="strike">nanoc</span></a>
+				    		<a href="http://jaspervdj.be/hakyll" target="_blank">Hakyll</a>
+            	        </div>
+            	    </div>
+                </div>
+			</div>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="http://yannesposito.com/Scratch/js/vendor/jquery-1.10.0.min.js"><\/script>')</script>
+        <script src="../../../js/jquery.scrolldepth.min.js"></script>
+        <script src="../../../js/jquery.cookie.js"></script>
+        <script src="../../../js/index.js"></script>
+        <script src="../../../js/highlight/highlight.pack.js"></script>
+        <script src="../../../js/article.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </body>
+</html>

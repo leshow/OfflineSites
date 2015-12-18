@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>YBlog - When regexp is not the best solution</title>
+        <meta name="keywords" content="programming, regexp, regular expression, extension, file" />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../../../img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="../../../css/scientific.css" />
+        <link rel="stylesheet" type="text/css" href="../../../js/highlight/styles/solarized_dark.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/solarized.css" />
+		<!-- Font -->
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/yannespositocomen" />
+        <!--[if lt IE 9]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+        <![endif]-->
+
+    </head>
+    <body lang="en" class="article">
+        <div id="content">
+	        			<div id="header">
+			    <div id="choix">
+        	        <div id="choixlang">
+                        <a href="../../../fr/blog/2010-02-23-When-regexp-is-not-the-best-solution/index.html">French</a> 
+        	        </div>
+					<div id="switchcss"><a href="index.html#">Change Theme</a></div>
+                    <div class="tomenu"><a href="index.html#navigation">↓ Menu ↓</a></div>
+        	        <div class="flush"></div>
+        	    </div>
+			</div>
+
+			<div id="titre">
+				<h1>When regexp is not the best solution</h1>
+				
+			</div>
+			<div class="flush"></div>
+			<div id="afterheader" class="article">
+				<div class="corps">
+					<p>Regular expression are really useful. Unfortunately, they are not always the best way of doing things. Particularly when transformations you want to make are easy.</p>
+<p>I wanted to know how to get file extension from filename the fastest way possible. There is 3 natural way of doing this:</p>
+<div>
+<p><code class="ruby"> # regexp str.match(/[^.]*<span class="math">/); <em>e</em><em>x</em><em>t</em> = </span>&amp;</p>
+<h1 id="split">split</h1>
+<p>ext=str.split(‘.’)[-1]</p>
+<h1 id="file-module">File module</h1>
+ext=File.extname(str) </code>
+</div>
+<p>At first sight I believed that the regexp should be faster than the split because it could be many <code>.</code> in a filename. But in reality, most of time there is only one dot and I realized the split will be faster. But not the fastest way. There is a function dedicated to this work in the <code>File</code> module.</p>
+<p>Here is the Benchmark ruby code:</p>
+<div>
+<p><code class="ruby" file="regex_benchmark_ext.rb"> #!/usr/bin/env ruby require ‘benchmark’ n=80000 tab=[ ‘/accounts/user.json’, ‘/accounts/user.xml’, ‘/user/titi/blog/toto.json’, ‘/user/titi/blog/toto.xml’ ]</p>
+puts “Get extname” Benchmark.bm do |x| x.report(“regexp:”) { n.times do str=tab[rand(4)]; str.match(/[^.]*<span class="math">/); <em>e</em><em>x</em><em>t</em> = </span>&amp;; end } x.report(&quot; split:“) { n.times do str=tab[rand(4)]; ext=str.split(‘.’)[-1] ; end } x.report(” File:“) { n.times do str=tab[rand(4)]; ext=File.extname(str); end } end </code>
+</div>
+<p>And here is the result</p>
+<pre class="twilight">
+Get extname
+            user     system      total        real
+regexp:  2.550000   0.020000   2.570000 (  2.693407)
+ split:  1.080000   0.050000   1.130000 (  1.190408)
+  File:  0.640000   0.030000   0.670000 (  0.717748)
+</pre>
+<p>Conclusion of this benchmark, dedicated function are better than your way of doing stuff (most of time).</p>
+<h2 id="file-path-without-the-extension.">file path without the extension.</h2>
+<div>
+<p><code class="ruby" file="regex_benchmark_strip.rb"> #!/usr/bin/env ruby require ‘benchmark’ n=80000 tab=[ ‘/accounts/user.json’, ‘/accounts/user.xml’, ‘/user/titi/blog/toto.json’, ‘/user/titi/blog/toto.xml’ ]</p>
+puts “remove extension” Benchmark.bm do |x| x.report(&quot; File:“) { n.times do str=tab[rand(4)]; path=File.expand_path(str,File.basename(str,File.extname(str))); end } x.report(”chomp:“) { n.times do str=tab[rand(4)]; ext=File.extname(str); path=str.chomp(ext); end } end </code>
+</div>
+<p>and here is the result:</p>
+<pre class="twilight">
+remove extension
+          user     system      total        real
+ File:  0.970000   0.060000   1.030000 (  1.081398)
+chomp:  0.820000   0.040000   0.860000 (  0.947432)
+</pre>
+<p>Conclusion of the second benchmark. One simple function is better than three dedicated functions. No surprise, but it is good to know.</p>
+				</div>
+                <div id="afterarticle">
+                    <div id="social">
+                        <a target="_blank" href="http://feeds.feedburner.com/yannespositocomen" class="social">r</a>
+                        ·
+                         <a target="_blank" href="https://twitter.com/home?status=http://yannesposito.com/Scratch/en/blog/2010-02-23-When-regexp-is-not-the-best-solution/%20via%20@yogsototh" class="social">t</a>
+                        ·
+                        <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/Scratch/en/blog/2010-02-23-When-regexp-is-not-the-best-solution/" class="social">`</a>
+                        ·
+                         <a target="_blank" href="https://plus.google.com/share?url=http://yannesposito.com/Scratch/en/blog/2010-02-23-When-regexp-is-not-the-best-solution/" class="social">g</a>
+                        <br />
+                        <a class="message" href="../Social-link-the-right-way/index.html">These social sharing links preserve your privacy</a>
+                    </div>
+        	        <div id="navigation">
+                        <a href="../../../../index.html">Home</a>
+                        <span class="sep">¦</span>
+        	            <a href="../../blog.1.html">Blog</a>
+                        <span class="sep">¦</span>
+                        <a href="../../softwares.html">Softwares</a>
+                        <span class="sep">¦</span>
+                        <a href="../../about.html">About</a>
+        	        </div>
+                    <div id="totop"><a href="index.html#header">↑ Top ↑</a></div>
+				    <div class="corps" id="comment">
+            	        <h2 class="first">Comments</h2>
+				    	<div id="disqus_thread"></div>
+        		    	<script type="text/javascript">
+        		    	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        		    	    var disqus_shortname = 'yannesposito'; // required: replace example with your forum shortname
+                            var disqus_identifier = '/Scratch/en/blog/2010-02-23-When-regexp-is-not-the-best-solution/index.html';
+
+        		    	    /* * * DON'T EDIT BELOW THIS LINE * * */
+        		    	    (function() {
+        		    	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        		    	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        		    	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        		    	    })();
+        		    	</script>
+        		    	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        		    	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				    </div>
+                    <div class="tomenu"><a>↑ Menu ↑</a></div>
+				    <div id="bottom">
+            	        <div>
+            	            Published on 2010-02-23
+            	        </div>
+            	        <div>
+            	            <a href="https://twitter.com/yogsototh">Follow @yogsototh</a>
+            	        </div>
+            	        <div>
+                            <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Yann Esposito©</a>
+            	        </div>
+            	        <div>
+            	            Done with
+            	            <a href="http://www.vim.org" target="_blank">Vim</a>
+				    		<span class="pala">&amp;</span>
+                            <a href="http://nanoc.ws" target="_blank"><span class="strike">nanoc</span></a>
+				    		<a href="http://jaspervdj.be/hakyll" target="_blank">Hakyll</a>
+            	        </div>
+            	    </div>
+                </div>
+			</div>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="http://yannesposito.com/Scratch/js/vendor/jquery-1.10.0.min.js"><\/script>')</script>
+        <script src="../../../js/jquery.scrolldepth.min.js"></script>
+        <script src="../../../js/jquery.cookie.js"></script>
+        <script src="../../../js/index.js"></script>
+        <script src="../../../js/highlight/highlight.pack.js"></script>
+        <script src="../../../js/article.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </body>
+</html>

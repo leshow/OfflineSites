@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>YBlog - La typography et le Web</title>
+        <meta name="keywords" content="web, design, typography" />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../../../img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="../../../css/scientific.css" />
+        <link rel="stylesheet" type="text/css" href="../../../js/highlight/styles/solarized_dark.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/solarized.css" />
+		<!-- Font -->
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/yannespositocomfr" />
+        <!--[if lt IE 9]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+        <![endif]-->
+
+    </head>
+    <body lang="fr" class="article">
+        <div id="content">
+	        			<div id="header">
+			    <div id="choix">
+        	        <div id="choixlang">
+                        <a href="../../../en/blog/Typography-and-the-Web/index.html">Anglais</a> 
+        	        </div>
+					<div id="switchcss"><a href="index.html#">Changer de theme</a></div>
+                    <div class="tomenu"><a href="index.html#navigation">↓ Menu ↓</a></div>
+        	        <div class="flush"></div>
+        	    </div>
+			</div>
+
+			<div id="titre">
+				<h1>La typography et le Web</h1>
+				
+			</div>
+			<div class="flush"></div>
+			<div id="afterheader" class="article">
+				<div class="corps">
+					<div>
+<img src="../../../img/blog/Typography-and-the-Web/first_sc_screenshot.png" alt />
+</div>
+<div class="intro">
+<p><span class="sc"><abbr title="Trop long; pas lu">tlpl</abbr>: </span> La typography sur le web est pourrie et nous ne somme pas près de voir ce problème réparé.</p>
+</div>
+<p>Je suis tombé sur ce site: <a href="http://opentypography.org/">open typography</a>. Leur message principal est&nbsp;:</p>
+<blockquote>
+<p>«There is no reason to wait for browser development to catch up. We can all create better web typography ourselves, today.»</p>
+</blockquote>
+<p>ou en français&nbsp;:</p>
+<blockquote>
+<p>«Nous ne somme pas obligé d’attendre le développement des navigateurs. Nous pouvons créer un web avec une meilleure typographie aujourd’hui.»</p>
+</blockquote>
+<p>Comme quelqu’un qui a déjà essayé d’améliorer la typographie de son site web, et en particulier des <em>ligatures</em>, je crois que c’est faux.</p>
+<p>J’ai déjà écrit un système automatique qui détecte et ajoute des ligatures en utilisant des caractères unicode. Cependant je n’ai jamais publié cette amélioration sur le web et voilà pourquoi&nbsp;:</p>
+<p>Tout d’abord, qu’est-ce qu’un ligature ?</p>
+<div>
+<img src="../../../img/blog/Typography-and-the-Web/ligatures.png" alt />
+</div>
+<p>Quel est le problème des ligatures sur le web ? Le premier c’est que vous ne pouvez pas chercher les mots qui contiennent ces ligatures. Par exemple essayez de chercher le mot “first”.</p>
+<ul>
+<li>first ← Pas de ligature, pas de problème<a href="index.html#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</li>
+<li><span class="red">ﬁ</span>r<span class="red">ﬆ </span> ← Une jolie ligature, mais introuvable avec une recherche (<code>C-f</code>).</li>
+</ul>
+<p>Le second problème est le rendu. Par exemple, essayer d’utiliser un charactère de ligature en petites capitales&nbsp;:</p>
+<ul>
+<li><sc>first</sc></li>
+<li><sc><span class="red">ﬁ</span>r<span class="red">ﬆ</span></sc></li>
+</ul>
+<p>Voici une capture d’écran pour que vous voyez ce que je vois&nbsp;:</p>
+<div>
+<img src="../../../img/blog/Typography-and-the-Web/first_sc_screenshot.png" alt />
+</div>
+<p>Le navigateur est incapable de comprendre que le caractère de ligature “<span class="red">ﬁ</span>” doit être rendu comme <sc>fi</sc> lorsqu’il est en petites capitales. Et une part du problème est que l’on peut décider d’écrire en petite majuscule dans le <span class="sc">css</span>.</p>
+<p>Comment par exemple utiliser un charactère de ligature unicode sur un site qui possède différents rendus via différentes <span class="sc">css</span> ?</p>
+<p>Comparons à <span style="text-transform: uppercase">L<sup style="vertical-align: 0.15em; margin-left: -0.36em; margin-right: -0.15em; font-size: .85em">a</sup>T<sub style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em; font-size: 1em">e</sub>X</span></p>
+<div>
+<img src="../../../img/blog/Typography-and-the-Web/first_latex_screenshot.png" alt />
+</div>
+<p>Si vous faites attention au détail, vous constaterez que le premier “first” contient une ligature. Bien entendu la deuxième ligne est affichée correctement. Le code que j’ai utilisé pour avoir ce rendu est simplement&nbsp;:</p>
+<pre class="sourceCode latex"><code class="sourceCode latex">\item first
+\item {\sc first}</code></pre>
+<p><span style="text-transform: uppercase">L<sup style="vertical-align: 0.15em; margin-left: -0.36em; margin-right: -0.15em; font-size: .85em">a</sup>T<sub style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em; font-size: 1em">e</sub>X</span> a été suffisamment intelligent pour créer les ligatures si nécessaire.</p>
+<p>La ligature “<span class="red">ﬆ</span>” est rare et n’est pas rendu par défaut par <span style="text-transform: uppercase">L<sup style="vertical-align: 0.15em; margin-left: -0.36em; margin-right: -0.15em; font-size: .85em">a</sup>T<sub style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em; font-size: 1em">e</sub>X</span>. Si vous voulez voir des ligatures rares, vous pouvez utiliser <span style="text-transform: uppercase">X<sub style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em; font-size: 1em">Ǝ</sub>L<sup style="vertical-align: 0.15em; margin-left: -0.36em; margin-right: -0.15em; font-size: .85em">a</sup>T<sub style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em; font-size: 1em">e</sub>X</span>:</p>
+<div>
+<img src="../../../img/blog/Typography-and-the-Web/xelatex_ligatures.jpg" alt="XeLaTeX ligatures" />
+</div>
+<p>J’ai copié cette image de l’excellent article de <a href="http://nitens.org/taraborelli/latex#rare">Dario Taraborelli</a>.</p>
+<p>Clairement il sera difficile aux navigateurs de corriger ces problèmes. Imaginez le nombre de petites exceptions.</p>
+<ul>
+<li>Le texte est en petites capitales, je ne dois pas utiliser de ligatures.</li>
+<li>Le mot courant contient un caractère de ligature, je ne dois pas chercher d’autre ligature dans ce mot.</li>
+<li>La fonte n’a pas défini de caractère unicode pour la ligature, je ne dois pas l’utiliser.</li>
+<li>Une commande javascript a modifé le CSS, je dois vérifier si je dois remplacer les ligatures par les deux caractères.</li>
+<li>etc…</li>
+</ul>
+<p>Dans tous les cas, si quelqu’un possède une solution je suis preneur !</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>En réalité, vous devriez pouvoir voir une ligature. Maintenant j’utilise : <code>text-rendering: optimizelegibility</code>. Le rendu est correct parce que j’utilise une fonte correct, à savoir Computer Modern de Donald Knuth.<a href="index.html#fnref1">↩</a></p></li>
+</ol>
+</div>
+				</div>
+                <div id="afterarticle">
+                    <div id="social">
+                        <a target="_blank" href="http://feeds.feedburner.com/yannespositocomfr" class="social">r</a>
+                        ·
+                         <a target="_blank" href="https://twitter.com/home?status=http://yannesposito.com/Scratch/fr/blog/Typography-and-the-Web/%20via%20@yogsototh" class="social">t</a>
+                        ·
+                        <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/Scratch/fr/blog/Typography-and-the-Web/" class="social">`</a>
+                        ·
+                         <a target="_blank" href="https://plus.google.com/share?url=http://yannesposito.com/Scratch/fr/blog/Typography-and-the-Web/" class="social">g</a>
+                        <br />
+                        <a class="message" href="../Social-link-the-right-way/index.html">Ces liens sociaux préservent votre vie privée</a>
+                    </div>
+        	        <div id="navigation">
+                        <a href="../../../../index.html">Accueil</a>
+                        <span class="sep">¦</span>
+        	            <a href="../../blog.1.html">Blog</a>
+                        <span class="sep">¦</span>
+                        <a href="../../softwares.html">Logiciels</a>
+                        <span class="sep">¦</span>
+                        <a href="../../about.html">Auteur</a>
+        	        </div>
+                    <div id="totop"><a href="index.html#header">↑ Top ↑</a></div>
+				    <div class="corps" id="comment">
+            	        <h2 class="first">Comments</h2>
+				    	<div id="disqus_thread"></div>
+        		    	<script type="text/javascript">
+        		    	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        		    	    var disqus_shortname = 'yannesposito'; // required: replace example with your forum shortname
+                            var disqus_identifier = '/Scratch/fr/blog/Typography-and-the-Web/index.html';
+
+        		    	    /* * * DON'T EDIT BELOW THIS LINE * * */
+        		    	    (function() {
+        		    	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        		    	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        		    	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        		    	    })();
+        		    	</script>
+        		    	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        		    	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				    </div>
+                    <div class="tomenu"><a>↑ Menu ↑</a></div>
+				    <div id="bottom">
+            	        <div>
+            	            Published on 2012-02-02
+            	        </div>
+            	        <div>
+            	            <a href="https://twitter.com/yogsototh">Follow @yogsototh</a>
+            	        </div>
+            	        <div>
+                            <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Yann Esposito©</a>
+            	        </div>
+            	        <div>
+            	            Done with
+            	            <a href="http://www.vim.org" target="_blank">Vim</a>
+				    		<span class="pala">&amp;</span>
+                            <a href="http://nanoc.ws" target="_blank"><span class="strike">nanoc</span></a>
+				    		<a href="http://jaspervdj.be/hakyll" target="_blank">Hakyll</a>
+            	        </div>
+            	    </div>
+                </div>
+			</div>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="http://yannesposito.com/Scratch/js/vendor/jquery-1.10.0.min.js"><\/script>')</script>
+        <script src="../../../js/jquery.scrolldepth.min.js"></script>
+        <script src="../../../js/jquery.cookie.js"></script>
+        <script src="../../../js/index.js"></script>
+        <script src="../../../js/highlight/highlight.pack.js"></script>
+        <script src="../../../js/article.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </body>
+</html>
