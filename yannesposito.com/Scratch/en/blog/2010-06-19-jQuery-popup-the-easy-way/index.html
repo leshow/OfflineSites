@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>YBlog - jQuery popup the easy way</title>
+        <meta name="keywords" content="jQuery, javascript, popup, blog, web" />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../../../img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="../../../css/scientific.css" />
+        <link rel="stylesheet" type="text/css" href="../../../js/highlight/styles/solarized_dark.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/solarized.css" />
+		<!-- Font -->
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/yannespositocomen" />
+        <!--[if lt IE 9]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+        <![endif]-->
+
+    </head>
+    <body lang="en" class="article">
+        <div id="content">
+	        			<div id="header">
+			    <div id="choix">
+        	        <div id="choixlang">
+                        <a href="../../../fr/blog/2010-06-19-jQuery-popup-the-easy-way/index.html">French</a> 
+        	        </div>
+					<div id="switchcss"><a href="index.html#">Change Theme</a></div>
+                    <div class="tomenu"><a href="index.html#navigation">↓ Menu ↓</a></div>
+        	        <div class="flush"></div>
+        	    </div>
+			</div>
+
+			<div id="titre">
+				<h1>jQuery popup the easy way</h1>
+				
+			</div>
+			<div class="flush"></div>
+			<div id="afterheader" class="article">
+				<div class="corps">
+					<p>Here is a fast and easy way to create jQuery popup.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// --- code popup ---</span>
+<span class="kw">function</span> <span class="fu">openPopup</span>() {
+    <span class="fu">$</span>(<span class="kw">this</span>).<span class="fu">clone</span>(<span class="kw">false</span>).<span class="fu">appendTo</span>(<span class="fu">$</span>(<span class="st">&quot;#_code&quot;</span>));
+    <span class="fu">$</span>(<span class="st">&quot;#_code&quot;</span>).<span class="fu">show</span>();
+}
+
+<span class="kw">function</span> <span class="fu">closePopup</span>() {
+    <span class="fu">$</span>(<span class="st">&quot;#_code&quot;</span>).<span class="fu">html</span>(<span class="st">&quot;&quot;</span>);
+    <span class="fu">$</span>(<span class="st">&quot;#_code&quot;</span>).<span class="fu">hide</span>();
+}
+
+<span class="kw">function</span> <span class="fu">initCode</span>() {
+    <span class="fu">$</span>(<span class="st">&quot;.code&quot;</span>).<span class="fu">click</span>(openPopup);
+    <span class="fu">$</span>(<span class="st">&quot;.code&quot;</span>).<span class="fu">css</span>({<span class="dt">cursor</span>: <span class="st">&quot;pointer&quot;</span>});
+    <span class="fu">$</span>(<span class="st">'body'</span>).<span class="fu">append</span>(<span class="st">'&lt;div id=&quot;_code&quot;&gt;&lt;/div&gt;'</span>);
+    <span class="fu">$</span>(<span class="st">'#_code'</span>).<span class="fu">css</span>( { <span class="st">'text-align'</span>: <span class="st">&quot;justify&quot;</span>, <span class="dt">position</span>: <span class="st">&quot;fixed&quot;</span>, 
+                        <span class="dt">left</span>:<span class="dv">0</span>, <span class="dt">top</span>:<span class="dv">0</span>, <span class="dt">width</span>: <span class="st">&quot;100%&quot;</span>, <span class="dt">height</span>: <span class="st">&quot;100%&quot;</span>, 
+                        <span class="st">&quot;background-color&quot;</span>: <span class="st">&quot;rgba(0, 0, 0, 0.8)&quot;</span>, <span class="st">'z-index'</span>:<span class="dv">2000</span>, <span class="st">'padding'</span>:<span class="st">'3px'</span>} );
+    <span class="fu">$</span>(<span class="st">'#_code'</span>).<span class="fu">hide</span>();
+    <span class="fu">$</span>(<span class="st">'#_code'</span>).<span class="fu">click</span>(closePopup);
+}
+<span class="co">// --- end of code popup section ---</span></code></pre>
+<p>What does this code do?</p>
+<p>At the loading of the page, I create a <code>div</code> as wide as the window. This <code>div</code> is a bit transparent. Then I hide it. I also take care to its <code>z-index</code> value to be sure it is behind all elements.</p>
+<p>Then when we click on a <code>div</code> of class <code>code</code>, I copy the content into this new wide <code>div</code>, and I show it. Really simple but really efficient. No need to use a <code>jQuery</code> plugin.</p>
+				</div>
+                <div id="afterarticle">
+                    <div id="social">
+                        <a target="_blank" href="http://feeds.feedburner.com/yannespositocomen" class="social">r</a>
+                        ·
+                         <a target="_blank" href="https://twitter.com/home?status=http://yannesposito.com/Scratch/en/blog/2010-06-19-jQuery-popup-the-easy-way/%20via%20@yogsototh" class="social">t</a>
+                        ·
+                        <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/Scratch/en/blog/2010-06-19-jQuery-popup-the-easy-way/" class="social">`</a>
+                        ·
+                         <a target="_blank" href="https://plus.google.com/share?url=http://yannesposito.com/Scratch/en/blog/2010-06-19-jQuery-popup-the-easy-way/" class="social">g</a>
+                        <br />
+                        <a class="message" href="../Social-link-the-right-way/index.html">These social sharing links preserve your privacy</a>
+                    </div>
+        	        <div id="navigation">
+                        <a href="../../../../index.html">Home</a>
+                        <span class="sep">¦</span>
+        	            <a href="../../blog.1.html">Blog</a>
+                        <span class="sep">¦</span>
+                        <a href="../../softwares.html">Softwares</a>
+                        <span class="sep">¦</span>
+                        <a href="../../about.html">About</a>
+        	        </div>
+                    <div id="totop"><a href="index.html#header">↑ Top ↑</a></div>
+				    <div class="corps" id="comment">
+            	        <h2 class="first">Comments</h2>
+				    	<div id="disqus_thread"></div>
+        		    	<script type="text/javascript">
+        		    	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        		    	    var disqus_shortname = 'yannesposito'; // required: replace example with your forum shortname
+                            var disqus_identifier = '/Scratch/en/blog/2010-06-19-jQuery-popup-the-easy-way/index.html';
+
+        		    	    /* * * DON'T EDIT BELOW THIS LINE * * */
+        		    	    (function() {
+        		    	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        		    	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        		    	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        		    	    })();
+        		    	</script>
+        		    	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        		    	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				    </div>
+                    <div class="tomenu"><a>↑ Menu ↑</a></div>
+				    <div id="bottom">
+            	        <div>
+            	            Published on 2010-06-19
+            	        </div>
+            	        <div>
+            	            <a href="https://twitter.com/yogsototh">Follow @yogsototh</a>
+            	        </div>
+            	        <div>
+                            <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Yann Esposito©</a>
+            	        </div>
+            	        <div>
+            	            Done with
+            	            <a href="http://www.vim.org" target="_blank">Vim</a>
+				    		<span class="pala">&amp;</span>
+                            <a href="http://nanoc.ws" target="_blank"><span class="strike">nanoc</span></a>
+				    		<a href="http://jaspervdj.be/hakyll" target="_blank">Hakyll</a>
+            	        </div>
+            	    </div>
+                </div>
+			</div>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="http://yannesposito.com/Scratch/js/vendor/jquery-1.10.0.min.js"><\/script>')</script>
+        <script src="../../../js/jquery.scrolldepth.min.js"></script>
+        <script src="../../../js/jquery.cookie.js"></script>
+        <script src="../../../js/index.js"></script>
+        <script src="../../../js/highlight/highlight.pack.js"></script>
+        <script src="../../../js/article.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </body>
+</html>

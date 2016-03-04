@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>YBlog - Maintenant sur Heroku</title>
+        <meta name="keywords" content="blog" />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../../../img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="../../../css/scientific.css" />
+        <link rel="stylesheet" type="text/css" href="../../../js/highlight/styles/solarized_dark.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/solarized.css" />
+		<!-- Font -->
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/yannespositocomfr" />
+        <!--[if lt IE 9]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+        <![endif]-->
+
+    </head>
+    <body lang="fr" class="article">
+        <div id="content">
+	        			<div id="header">
+			    <div id="choix">
+        	        <div id="choixlang">
+                        <a href="../../../en/blog/2010-08-23-Now-heberged-on-heroku/index.html">Anglais</a> 
+        	        </div>
+					<div id="switchcss"><a href="index.html#">Changer de theme</a></div>
+                    <div class="tomenu"><a href="index.html#navigation">↓ Menu ↓</a></div>
+        	        <div class="flush"></div>
+        	    </div>
+			</div>
+
+			<div id="titre">
+				<h1>Maintenant sur Heroku</h1>
+				<h2>Héberger un site web statique sur heroku</h2>
+
+			</div>
+			<div class="flush"></div>
+			<div id="afterheader" class="article">
+				<div class="corps">
+					<h1 id="maintenant-sur-heroku">Maintenant sur <a href="http://heroku.com">Heroku</a></h1>
+<p>J’ai changé mon hébergeur. Mobileme n’est absolument pas adapté à la diffusion de mon blog. C’est pourquoi je suis passé à <a href="http://heroku.com">Heroku</a>.</p>
+<p>Mais comme vous devez le savoir mon blog est un site complètement statique. J’utilise <a href="http://nanoc.stoneship.org/">nanoc</a> pour l’engendrer. Avoir un site statique amène beaucoup d’avantages par rapport à un site dynamique. Surtout en terme de sécurité. Voici comment configurer un site statique sur heroku.</p>
+<p>La racine de mes fichiers est ‘/output’. Vous devez simplement créer deux fichiers. Un fichier <code>config.ru</code><a href="index.html#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>&nbsp;:</p>
+<pre class="sourceCode ruby"><code class="sourceCode ruby">require <span class="st">'rubygems'</span>
+require <span class="st">'rack'</span>
+require <span class="st">'rack/contrib'</span>
+require <span class="st">'rack-rewrite'</span>
+require <span class="st">'mime/types'</span>
+
+use <span class="dt">Rack</span>::<span class="dt">ETag</span>
+<span class="kw">module</span> ::<span class="dt">Rack</span>
+    <span class="kw">class</span> <span class="dt">TryStatic</span> &lt; <span class="dt">Static</span>
+
+        <span class="kw">def</span> initialize(app, options)
+            <span class="dv">super</span>
+            <span class="ot">@try</span> = ([<span class="st">''</span>] + <span class="dt">Array</span>(options.delete(<span class="st">:try</span>)) + [<span class="st">''</span>])
+        <span class="kw">end</span>
+
+        <span class="kw">def</span> call(env)
+            <span class="ot">@next</span> = <span class="dv">0</span>
+            <span class="kw">while</span> <span class="ot">@next</span> &lt; <span class="ot">@try</span>.size &amp;&amp; <span class="dv">404</span> == (resp = <span class="dv">super</span>(try_next(env)))[<span class="dv">0</span>] 
+                <span class="ot">@next</span> += <span class="dv">1</span>
+            <span class="kw">end</span>
+            <span class="dv">404</span> == resp[<span class="dv">0</span>] ? <span class="ot">@app</span>.call : resp
+        <span class="kw">end</span>
+
+        <span class="kw">private</span>
+        <span class="kw">def</span> try_next(env)
+            env.merge(<span class="st">'PATH_INFO'</span> =&gt; env[<span class="st">'PATH_INFO'</span>] + <span class="ot">@try</span>[<span class="ot">@next</span>])
+        <span class="kw">end</span>
+
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+use <span class="dt">Rack</span>::<span class="dt">TryStatic</span>, 
+    <span class="st">:root</span> =&gt; <span class="st">&quot;output&quot;</span>,                              <span class="co"># static files root dir</span>
+    <span class="st">:urls</span> =&gt;<span class="ot"> %w[</span><span class="st">/</span><span class="ot">]</span>,                                 <span class="co"># match all requests </span>
+    <span class="st">:try</span> =&gt; [<span class="st">'.html'</span>, <span class="st">'index.html'</span>, <span class="st">'/index.html'</span>]  <span class="co"># try these postfixes sequentially</span>
+
+errorFile=<span class="st">'output/Scratch/en/error/404-not_found/index.html'</span>
+run lambda { [<span class="dv">404</span>, {
+                <span class="st">&quot;Last-Modified&quot;</span>  =&gt; <span class="dt">File</span>.mtime(errorFile).httpdate,
+                <span class="st">&quot;Content-Type&quot;</span>   =&gt; <span class="st">&quot;text/html&quot;</span>,
+                <span class="st">&quot;Content-Length&quot;</span> =&gt; <span class="dt">File</span>.size(errorFile).to_s
+            }, <span class="dt">File</span>.read(errorFile)] }</code></pre>
+<p>et un fichier <code>.gems</code> qui liste les gems nécessaires.</p>
+<pre class="sourceCode ruby"><code class="sourceCode ruby">rack
+rack-rewrite
+rack-contrib</code></pre>
+<p>Maintenant il suffit de suivre l’introduction rapide d’heroku pour créer une nouvelle application&nbsp;:</p>
+<pre class="sourceCode zsh"><code class="sourceCode zsh">git init
+git add <span class="kw">.</span>
+heroku create
+git push heroku master</code></pre>
+<p>Maintenant je peux rediriger correctement mes erreurs 404. J’espère que ça a pu vous être utile.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Je me suis complètement inspiré de cet <a href="http://gmarik.info/blog/2010/05/10/blogging-with-jekyll-and-heroku-for-free">article</a>.<a href="index.html#fnref1">↩</a></p></li>
+</ol>
+</div>
+				</div>
+                <div id="afterarticle">
+                    <div id="social">
+                        <a target="_blank" href="http://feeds.feedburner.com/yannespositocomfr" class="social">r</a>
+                        ·
+                         <a target="_blank" href="https://twitter.com/home?status=http://yannesposito.com/Scratch/fr/blog/2010-08-23-Now-heberged-on-heroku/%20via%20@yogsototh" class="social">t</a>
+                        ·
+                        <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/Scratch/fr/blog/2010-08-23-Now-heberged-on-heroku/" class="social">`</a>
+                        ·
+                         <a target="_blank" href="https://plus.google.com/share?url=http://yannesposito.com/Scratch/fr/blog/2010-08-23-Now-heberged-on-heroku/" class="social">g</a>
+                        <br />
+                        <a class="message" href="../Social-link-the-right-way/index.html">Ces liens sociaux préservent votre vie privée</a>
+                    </div>
+        	        <div id="navigation">
+                        <a href="../../../../index.html">Accueil</a>
+                        <span class="sep">¦</span>
+        	            <a href="../../blog.1.html">Blog</a>
+                        <span class="sep">¦</span>
+                        <a href="../../softwares.html">Logiciels</a>
+                        <span class="sep">¦</span>
+                        <a href="../../about.html">Auteur</a>
+        	        </div>
+                    <div id="totop"><a href="index.html#header">↑ Top ↑</a></div>
+				    <div class="corps" id="comment">
+            	        <h2 class="first">Comments</h2>
+				    	<div id="disqus_thread"></div>
+        		    	<script type="text/javascript">
+        		    	    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        		    	    var disqus_shortname = 'yannesposito'; // required: replace example with your forum shortname
+                            var disqus_identifier = '/Scratch/fr/blog/2010-08-23-Now-heberged-on-heroku/index.html';
+
+        		    	    /* * * DON'T EDIT BELOW THIS LINE * * */
+        		    	    (function() {
+        		    	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        		    	        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        		    	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        		    	    })();
+        		    	</script>
+        		    	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        		    	<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				    </div>
+                    <div class="tomenu"><a>↑ Menu ↑</a></div>
+				    <div id="bottom">
+            	        <div>
+            	            Published on 2010-08-23
+            	        </div>
+            	        <div>
+            	            <a href="https://twitter.com/yogsototh">Follow @yogsototh</a>
+            	        </div>
+            	        <div>
+                            <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Yann Esposito©</a>
+            	        </div>
+            	        <div>
+            	            Done with
+            	            <a href="http://www.vim.org" target="_blank">Vim</a>
+				    		<span class="pala">&amp;</span>
+                            <a href="http://nanoc.ws" target="_blank"><span class="strike">nanoc</span></a>
+				    		<a href="http://jaspervdj.be/hakyll" target="_blank">Hakyll</a>
+            	        </div>
+            	    </div>
+                </div>
+			</div>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="http://yannesposito.com/Scratch/js/vendor/jquery-1.10.0.min.js"><\/script>')</script>
+        <script src="../../../js/jquery.scrolldepth.min.js"></script>
+        <script src="../../../js/jquery.cookie.js"></script>
+        <script src="../../../js/index.js"></script>
+        <script src="../../../js/highlight/highlight.pack.js"></script>
+        <script src="../../../js/article.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </body>
+</html>
